@@ -1,6 +1,6 @@
 # 🎸 Band Manager - Gestionnaire de Groupe Musical
 
-**Lien de l'application :** https://smile14-lytor.github.io/music-/
+**Lien de l'application :** https://smile14-lytor.github.io/music/
 
 Une application web pour organiser et répartir les parties musicales dans un groupe.
 
