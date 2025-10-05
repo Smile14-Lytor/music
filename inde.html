@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionnaire de Groupe Musical</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .admin-badge {
+            background: #ef4444;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #334155;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 25px;
+        }
+
+        .sidebar {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            height: fit-content;
+        }
+
+        .nav-item {
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-item:hover {
+            background: #f1f5f9;
+        }
+
+        .nav-item.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .songs-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .song-card {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .song-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .song-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .song-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .song-artist {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .delete-song-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .parts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .part-card {
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s;
+        }
+
+        .part-card:hover {
+            border-color: #667eea;
+        }
+
+        .part-name {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #334155;
+        }
+
+        .part-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-learned {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-learning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-not-started {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-empty {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .assign-btn {
+            width: 100%;
+            margin-top: 10px;
+            padding: 8px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .assign-btn:hover {
+            background: #5568d3;
+        }
+
+        .unassign-btn {
+            background: #ef4444;
+        }
+
+        .unassign-btn:hover {
+            background: #dc2626;
+        }
+
+        .auth-container {
+            max-width: 450px;
+            margin: 100px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .auth-container h2 {
+            color: #667eea;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 28px;
+        }
+
+        .auth-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 12px;
+            background: #f1f5f9;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .auth-tab.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #334155;
+            font-weight: 600;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+        }
+
+        .add-song-form {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .instrument-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            background: #ddd6fe;
+            color: #5b21b6;
+            border-radius: 15px;
+            font-size: 12px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .user-card {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+        }
+
+        .empty-state h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #64748b;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .parts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="app">
+        <div class="loading">⏳ Connexion à Supabase...</div>
+    </div>
+
+    <script>
+        // Configuration Supabase
+        const SUPABASE_URL = 'https://myobgndifpksdtnqlrfn.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im15b2JnbmRpZnBrc2R0bnFscmZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2NjY4MzMsImV4cCI6MjA3NTI0MjgzM30.E5WzcT61zAFogPkVWj5g4DNuJkohUswVr1PmbCnN9sQ';
+
+        // Variables globales
+        let users = [];
+        let songs = [];
+        let parts = [];
+        let currentUser = null;
+        let currentView = 'songs';
+        let authMode = 'login';
+
+        const availableInstruments = [
+            'Voix/Chant',
+            'Guitare',
+            'Basse',
+            'Batterie',
+            'Clavier/Piano',
+            'Saxophone',
+            'Trompette',
+            'Violon'
+        ];
+
+        // MODIFICATION ICI : Ajout de "Guitare 3" dans la liste des parties
+        const partNames = [
+            'Voix principale',
+            'Chœurs',
+            'Guitare rythmique',
+            'Guitare lead',
+            'Guitare 3',  // ← NOUVELLE PARTIE AJOUTÉE
+            'Basse',
+            'Batterie',
+            'Claviers'
+        ];
+
+        // API REST directe (contournement du problème Headers)
+        async function supabaseQuery(table, method = 'GET', data = null, filters = null) {
+            let url = `${SUPABASE_URL}/rest/v1/${table}`;
+            
+            if (filters) {
+                const params = new URLSearchParams();
+                Object.entries(filters).forEach(([key, value]) => {
+                    params.append(key, `eq.${value}`);
+                });
+                url += '?' + params.toString();
+            }
+            
+            if (method === 'GET') {
+                url += (filters ? '&' : '?') + 'select=*';
+            }
+
+            const options = {
+                method: method,
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
+                }
+            };
+
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+
+            const response = await fetch(url, options);
+            const result = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(result.message || 'Erreur API');
+            }
+            
+            return result;
+        }
+
+        // Chargement des données
+        async function loadData() {
+            try {
+                users = await supabaseQuery('users');
+                songs = await supabaseQuery('songs');
+                parts = await supabaseQuery('parts');
+                render();
+            } catch (error) {
+                console.error('Erreur:', error);
+                document.getElementById('app').innerHTML = `
+                    <div class="auth-container">
+                        <h2 style="color: #ef4444;">❌ Erreur</h2>
+                        <p style="text-align: center; color: #64748b; margin-top: 20px;">
+                            ${error.message}
+                        </p>
+                        <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="loadData()">
+                            Réessayer
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Fonctions utilitaires
+        function getUserById(id) {
+            return users.find(u => u.id === id);
+        }
+
+        function getStatusLabel(status) {
+            const labels = {
+                'learned': '✅ Maîtrisé',
+                'learning': '🔄 En cours',
+                'not-started': '❌ Pas commencé',
+                'empty': '⚪ Disponible'
+            };
+            return labels[status] || status;
+        }
+
+        function getSongParts(songId) {
+            const songParts = {};
+            partNames.forEach(partName => {
+                const part = parts.find(p => p.song_id === songId && p.part_name === partName);
+                songParts[partName] = part || { user_id: null, status: 'empty' };
+            });
+            return songParts;
+        }
+
+        // Rendu des composants
+        function renderAuth() {
+            return `
+                <div class="auth-container">
+                    <h2>🎸 Band Manager</h2>
+                    
+                    <div class="auth-tabs">
+                        <button class="auth-tab ${authMode === 'login' ? 'active' : ''}" onclick="switchAuthMode('login')">
+                            Connexion
+                        </button>
+                        <button class="auth-tab ${authMode === 'signup' ? 'active' : ''}" onclick="switchAuthMode('signup')">
+                            Inscription
+                        </button>
+                    </div>
+
+                    <div class="auth-form ${authMode === 'login' ? 'active' : ''}" id="login-form">
+                        <div class="form-group">
+                            <label>Nom</label>
+                            <input type="text" id="login-name" placeholder="Votre nom">
+                        </div>
+                        <div class="form-group">
+                            <label>Mot de passe</label>
+                            <input type="password" id="login-password" placeholder="••••••••">
+                        </div>
+                        <button class="btn btn-primary" style="width: 100%;" onclick="login()">Se connecter</button>
+                    </div>
+
+                    <div class="auth-form ${authMode === 'signup' ? 'active' : ''}" id="signup-form">
+                        <div class="form-group">
+                            <label>Nom</label>
+                            <input type="text" id="signup-name" placeholder="Votre nom">
+                        </div>
+                        <div class="form-group">
+                            <label>Mot de passe</label>
+                            <input type="password" id="signup-password" placeholder="••••••••">
+                        </div>
+                        <div class="form-group">
+                            <label>Instrument(s) pratiqué(s)</label>
+                            <div class="checkbox-group" id="instruments-list">
+                                ${availableInstruments.map(inst => `
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="inst-${inst.replace(/\//g, '-')}" value="${inst}">
+                                        <label for="inst-${inst.replace(/\//g, '-')}" style="margin: 0; font-weight: normal;">${inst}</label>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" style="width: 100%;" onclick="signup()">S'inscrire</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderHeader() {
+            return `
+                <div class="header">
+                    <h1>
+                        🎸 Band Manager
+                        ${currentUser.is_admin ? '<span class="admin-badge">ADMIN</span>' : ''}
+                    </h1>
+                    <div class="user-info">
+                        <span style="color: #64748b;">Connecté: <strong>${currentUser.name}</strong></span>
+                        <button class="btn btn-secondary" onclick="logout()">Déconnexion</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSidebar() {
+            return `
+                <div class="sidebar">
+                    <div class="nav-item ${currentView === 'songs' ? 'active' : ''}" onclick="changeView('songs')">
+                        🎵 Morceaux
+                    </div>
+                    <div class="nav-item ${currentView === 'profile' ? 'active' : ''}" onclick="changeView('profile')">
+                        👤 Mon Profil
+                    </div>
+                    <div class="nav-item ${currentView === 'members' ? 'active' : ''}" onclick="changeView('members')">
+                        👥 Membres
+                    </div>
+                    ${currentUser.is_admin ? `
+                        <div class="nav-item ${currentView === 'admin' ? 'active' : ''}" onclick="changeView('admin')">
+                            ⚙️ Administration
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function renderAddSongForm() {
+            return `
+                <div class="add-song-form">
+                    <h3 style="margin-bottom: 15px;">➕ Ajouter un morceau</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px;">
+                        <input type="text" id="new-song-title" placeholder="Titre" style="padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px;">
+                        <input type="text" id="new-song-artist" placeholder="Artiste" style="padding: 10px; border: 2px solid #e2e8f0; border-radius: 6px;">
+                        <button class="btn btn-primary" onclick="addSong()">Ajouter</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSongs() {
+            if (songs.length === 0) {
+                return `
+                    ${currentUser.is_admin ? renderAddSongForm() : ''}
+                    <div class="empty-state">
+                        <h3>🎵 Aucun morceau pour le moment</h3>
+                        <p>${currentUser.is_admin ? 'Commencez par ajouter votre premier morceau ci-dessus !' : 'L\'administrateur n\'a pas encore ajouté de morceaux.'}</p>
+                    </div>
+                `;
+            }
+
+            return `
+                ${currentUser.is_admin ? renderAddSongForm() : ''}
+                <div class="songs-grid">
+                    ${songs.map(song => {
+                        const songParts = getSongParts(song.id);
+                        return `
+                        <div class="song-card">
+                            ${currentUser.is_admin ? `
+                                <button class="delete-song-btn" onclick="deleteSong(${song.id})">🗑️ Supprimer</button>
+                            ` : ''}
+                            <div class="song-header">
+                                <div>
+                                    <div class="song-title">${song.title}</div>
+                                    <div class="song-artist">${song.artist}</div>
+                                </div>
+                            </div>
+                            <div class="parts-grid">
+                                ${Object.entries(songParts).map(([partName, part]) => {
+                                    const assignedUser = part.user_id ? getUserById(part.user_id) : null;
+                                    const isAssignedToMe = part.user_id === currentUser.id;
+                                    const canAssign = currentUser.is_admin || !part.user_id;
+                                    return `
+                                        <div class="part-card">
+                                            <div class="part-name">${partName}</div>
+                                            ${assignedUser ? `
+                                                <div style="color: #667eea; font-size: 14px; margin-top: 5px;">
+                                                    ${assignedUser.name}
+                                                </div>
+                                            ` : '<div style="color: #94a3b8; font-size: 14px; margin-top: 5px;">Non assigné</div>'}
+                                            <div class="part-status">
+                                                <span class="status-badge status-${part.status}">${getStatusLabel(part.status)}</span>
+                                            </div>
+                                            ${isAssignedToMe || currentUser.is_admin ? `
+                                                <select onchange="updatePartStatus(${song.id}, '${partName}', this.value)" style="width: 100%; margin-top: 10px; padding: 6px; border-radius: 6px; border: 2px solid #e2e8f0;">
+                                                    <option value="not-started" ${part.status === 'not-started' ? 'selected' : ''}>❌ Pas commencé</option>
+                                                    <option value="learning" ${part.status === 'learning' ? 'selected' : ''}>🔄 En cours</option>
+                                                    <option value="learned" ${part.status === 'learned' ? 'selected' : ''}>✅ Maîtrisé</option>
+                                                </select>
+                                            ` : ''}
+                                            ${isAssignedToMe ? `
+                                                <button class="assign-btn unassign-btn" onclick="unassignPart(${song.id}, '${partName}')">
+                                                    Se désister
+                                                </button>
+                                            ` : canAssign && !part.user_id ? `
+                                                <button class="assign-btn" onclick="assignPart(${song.id}, '${partName}')">
+                                                    S'assigner
+                                                </button>
+                                            ` : ''}
+                                            ${currentUser.is_admin && part.user_id && !isAssignedToMe ? `
+                                                <button class="assign-btn unassign-btn" onclick="unassignPart(${song.id}, '${partName}')">
+                                                    Retirer l'assignation
+                                                </button>
+                                            ` : ''}
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    `}).join('')}
+                </div>
+            `;
+        }
+
+        function renderProfile() {
+            return `
+                <div>
+                    <h2 style="margin-bottom: 25px;">👤 Mon Profil</h2>
+                    <div style="background: #f8fafc; padding: 25px; border-radius: 12px;">
+                        <div style="margin-bottom: 20px;">
+                            <h3 style="color: #334155; margin-bottom: 5px;">Nom</h3>
+                            <p style="font-size: 18px; color: #64748b;">${currentUser.name}</p>
+                        </div>
+                        <div>
+                            <h3 style="color: #334155; margin-bottom: 10px;">Instruments</h3>
+                            <div>
+                                ${currentUser.instruments && currentUser.instruments.length > 0 ? 
+                                    currentUser.instruments.map(inst => `
+                                        <span class="instrument-tag">${inst}</span>
+                                    `).join('') 
+                                : '<p style="color: #94a3b8;">Aucun instrument renseigné</p>'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderMembers() {
+            const regularUsers = users.filter(u => !u.is_admin);
+            
+            if (regularUsers.length === 0) {
+                return `
+                    <div>
+                        <h2 style="margin-bottom: 25px;">👥 Membres du Groupe</h2>
+                        <div class="empty-state">
+                            <h3>👥 Aucun membre pour le moment</h3>
+                            <p>Les musiciens qui s'inscrivent apparaîtront ici.</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            return `
+                <div>
+                    <h2 style="margin-bottom: 25px;">👥 Membres du Groupe</h2>
+                    <div class="songs-grid">
+                        ${regularUsers.map(user => `
+                            <div class="user-card">
+                                <div>
+                                    <h3 style="color: #667eea; margin-bottom: 10px;">${user.name}</h3>
+                                    <div>
+                                        ${user.instruments && user.instruments.length > 0 ? user.instruments.map(inst => `
+                                            <span class="instrument-tag">${inst}</span>
+                                        `).join('') : '<span style="color: #94a3b8;">Aucun instrument</span>'}
+                                    </div>
+                                </div>
+                                ${currentUser.is_admin ? `
+                                    <button class="btn btn-danger" onclick="deleteUser(${user.id})">
+                                        🗑️ Supprimer
+                                    </button>
+                                ` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAdmin() {
+            const learnedParts = parts.filter(p => p.status === 'learned').length;
+            return `
+                <div>
+                    <h2 style="margin-bottom: 25px;">⚙️ Administration</h2>
+                    <div style="background: #f8fafc; padding: 25px; border-radius: 12px; margin-bottom: 20px;">
+                        <h3 style="margin-bottom: 15px;">📊 Statistiques</h3>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                            <div style="background: white; padding: 20px; border-radius: 8px; text-align: center;">
+                                <div style="font-size: 32px; font-weight: 700; color: #667eea;">${users.filter(u => !u.is_admin).length}</div>
+                                <div style="color: #64748b; margin-top: 5px;">Membres</div>
+                            </div>
+                            <div style="background: white; padding: 20px; border-radius: 8px; text-align: center;">
+                                <div style="font-size: 32px; font-weight: 700; color: #667eea;">${songs.length}</div>
+                                <div style="color: #64748b; margin-top: 5px;">Morceaux</div>
+                            </div>
+                            <div style="background: white; padding: 20px; border-radius: 8px; text-align: center;">
+                                <div style="font-size: 32px; font-weight: 700; color: #667eea;">${learnedParts}</div>
+                                <div style="color: #64748b; margin-top: 5px;">Parties maîtrisées</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="background: #dcfce7; padding: 20px; border-radius: 12px; border: 2px solid #22c55e;">
+                        <h3 style="color: #166534; margin-bottom: 10px;">✅ Base de données connectée</h3>
+                        <p style="color: #166534;">Toutes les données sont synchronisées avec Supabase.</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderContent() {
+            if (currentView === 'songs') return renderSongs();
+            if (currentView === 'profile') return renderProfile();
+            if (currentView === 'members') return renderMembers();
+            if (currentView === 'admin') return renderAdmin();
+        }
+
+        function render() {
+            const app = document.getElementById('app');
+            if (!currentUser) {
+                app.innerHTML = renderAuth();
+            } else {
+                app.innerHTML = `
+                    ${renderHeader()}
+                    <div class="main-content">
+                        ${renderSidebar()}
+                        <div class="content">
+                            ${renderContent()}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Actions
+        function switchAuthMode(mode) {
+            authMode = mode;
+            render();
+        }
+
+        async function login() {
+            const name = document.getElementById('login-name').value;
+            const password = document.getElementById('login-password').value;
+            
+            if (!name || !password) {
+                alert('Veuillez remplir tous les champs');
+                return;
+            }
+
+            const user = users.find(u => u.name === name && u.password === password);
+            if (user) {
+                currentUser = user;
+                render();
+            } else {
+                alert('Nom ou mot de passe incorrect');
+            }
+        }
+
+        async function signup() {
+            const name = document.getElementById('signup-name').value;
+            const password = document.getElementById('signup-password').value;
+            
+            if (!name || !password) {
+                alert('Veuillez remplir tous les champs');
+                return;
+            }
+
+            const existingUser = users.find(u => u.name === name);
+            if (existingUser) {
+                alert('Ce nom est déjà pris');
+                return;
+            }
+
+            const selectedInstruments = [];
+            availableInstruments.forEach(inst => {
+                const checkbox = document.getElementById(`inst-${inst.replace(/\//g, '-')}`);
+                if (checkbox && checkbox.checked) {
+                    selectedInstruments.push(inst);
+                }
+            });
+
+            try {
+                const newUser = await supabaseQuery('users', 'POST', {
+                    name: name,
+                    password: password,
+                    instruments: selectedInstruments,
+                    is_admin: false
+                });
+
+                currentUser = Array.isArray(newUser) ? newUser[0] : newUser;
+                await loadData();
+            } catch (error) {
+                alert('Erreur lors de l\'inscription: ' + error.message);
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            currentView = 'songs';
+            authMode = 'login';
+            render();
+        }
+
+        function changeView(view) {
+            currentView = view;
+            render();
+        }
+
+        async function assignPart(songId, partName) {
+            const existingPart = parts.find(p => p.song_id === songId && p.part_name === partName);
+            
+            try {
+                if (existingPart) {
+                    await supabaseQuery('parts', 'PATCH', {
+                        user_id: currentUser.id,
+                        status: 'not-started'
+                    }, { id: existingPart.id });
+                } else {
+                    await supabaseQuery('parts', 'POST', {
+                        song_id: songId,
+                        part_name: partName,
+                        user_id: currentUser.id,
+                        status: 'not-started'
+                    });
+                }
+                await loadData();
+            } catch (error) {
+                alert('Erreur: ' + error.message);
+            }
+        }
+
+        async function unassignPart(songId, partName) {
+            const existingPart = parts.find(p => p.song_id === songId && p.part_name === partName);
+            
+            if (existingPart) {
+                try {
+                    await supabaseQuery('parts', 'PATCH', {
+                        user_id: null,
+                        status: 'empty'
+                    }, { id: existingPart.id });
+                    await loadData();
+                } catch (error) {
+                    alert('Erreur: ' + error.message);
+                }
+            }
+        }
+
+        async function updatePartStatus(songId, partName, status) {
+            const existingPart = parts.find(p => p.song_id === songId && p.part_name === partName);
+            
+            if (existingPart) {
+                try {
+                    await supabaseQuery('parts', 'PATCH', {
+                        status: status
+                    }, { id: existingPart.id });
+                    await loadData();
+                } catch (error) {
+                    alert('Erreur: ' + error.message);
+                }
+            }
+        }
+
+        async function addSong() {
+            if (!currentUser.is_admin) {
+                alert('Seul l\'administrateur peut ajouter des morceaux');
+                return;
+            }
+
+            const title = document.getElementById('new-song-title').value;
+            const artist = document.getElementById('new-song-artist').value;
+            
+            if (!title || !artist) {
+                alert('Veuillez remplir tous les champs');
+                return;
+            }
+
+            try {
+                const newSong = await supabaseQuery('songs', 'POST', {
+                    title: title,
+                    artist: artist
+                });
+
+                const songId = Array.isArray(newSong) ? newSong[0].id : newSong.id;
+
+                for (const partName of partNames) {
+                    await supabaseQuery('parts', 'POST', {
+                        song_id: songId,
+                        part_name: partName,
+                        user_id: null,
+                        status: 'empty'
+                    });
+                }
+
+                document.getElementById('new-song-title').value = '';
+                document.getElementById('new-song-artist').value = '';
+                await loadData();
+            } catch (error) {
+                alert('Erreur: ' + error.message);
+            }
+        }
+
+        async function deleteSong(songId) {
+            if (!currentUser.is_admin) {
+                alert('Seul l\'administrateur peut supprimer des morceaux');
+                return;
+            }
+
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce morceau ?')) {
+                try {
+                    await supabaseQuery('songs', 'DELETE', null, { id: songId });
+                    await loadData();
+                } catch (error) {
+                    alert('Erreur: ' + error.message);
+                }
+            }
+        }
+
+        async function deleteUser(userId) {
+            if (!currentUser.is_admin) {
+                alert('Seul l\'administrateur peut supprimer des membres');
+                return;
+            }
+
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce membre ?')) {
+                try {
+                    await supabaseQuery('users', 'DELETE', null, { id: userId });
+                    await loadData();
+                } catch (error) {
+                    alert('Erreur: ' + error.message);
+                }
+            }
+        }
+
+        // Initialisation
+        loadData();
+    </script>
+</body>
+</html>
